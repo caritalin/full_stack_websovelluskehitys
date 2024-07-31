@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant User
+    participant Browser
+    participant Server
+
+    User->>Browser: User submits a new note
+    activate Browser
+
+    Browser->>Server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+    activate Server
+    Server-->>Browser: Response (success/failure)
+    deactivate Server
+
+    Note right of Browser: Browser updates the UI to show the new note (optimistic update)
+
+    Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/data.json (to fetch updated notes)
+    activate Server
+    Server-->>Browser: JSON data with updated notes
+    deactivate Server
+
+    Note right of Browser: Browser re-renders the notes with the new data
+    deactivate Browser
