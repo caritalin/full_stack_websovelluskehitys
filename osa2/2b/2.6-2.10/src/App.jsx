@@ -1,24 +1,30 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
-  ]) 
-  const [newName, setNewName] = useState('')
+  const [persons, setPersons] = useState([{ name: 'Arto Hellas' }]);
+  const [newName, setNewName] = useState('');
 
   // Handler for form submission
   const addPerson = (event) => {
-    event.preventDefault() // Prevent page reload
-    const personObject = { name: newName }
+    event.preventDefault(); // Prevent page reload
 
-    setPersons(persons.concat(personObject)) // Add new person to the list
-    setNewName('') // Clear the input field after submission
-  }
+    // Check if the name already exists in the phonebook
+    const nameExists = persons.some(person => person.name === newName);
+    if (nameExists) {
+      alert(`${newName} is already added to phonebook`);
+      return; // Stop the function if name exists
+    }
+
+    const personObject = { name: newName };
+
+    setPersons(persons.concat(personObject)); // Add new person to the list
+    setNewName(''); // Clear the input field after submission
+  };
 
   // Handler for input change
   const handleNameChange = (event) => {
-    setNewName(event.target.value)
-  }
+    setNewName(event.target.value);
+  };
 
   return (
     <div>
@@ -32,16 +38,14 @@ const App = () => {
         </div>
       </form>
 
-      <div>debug: {newName}</div> {/* For debugging, remove when not needed */}
-
       <h2>Numbers</h2>
       <ul>
-        {persons.map(person => 
+        {persons.map(person => (
           <li key={person.name}>{person.name}</li>
-        )}
+        ))}
       </ul>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
