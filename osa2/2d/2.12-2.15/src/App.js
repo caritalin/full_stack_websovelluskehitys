@@ -10,7 +10,6 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
 
-  // Fetch persons from server
   useEffect(() => {
     personService.getAll().then((response) => {
       setPersons(response.data);
@@ -23,13 +22,31 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    const personExists = persons.some((person) => person.name === newName);
+    const personExists = persons.find((person) => person.name === newName);
 
     if (personExists) {
-      alert(`${newName} is already added to the phonebook`);
+      const confirmUpdate = window.confirm(
+        `${newName} is already in the phonebook. Do you want to replace their old number with the new one?`
+      );
+      if (confirmUpdate) {
+        const updatedPerson = { ...personExists, number: newNumber };
+        personService
+          .update(personExists.id, updatedPerson)
+          .then((response) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== personExists.id ? person : response.data
+              )
+            );
+            setNewName('');
+            setNewNumber('');
+          })
+          .catch((error) => {
+            console.error('Error updating person:', error);
+          });
+      }
     } else {
       const newPerson = { name: newName, number: newNumber };
-
       personService.create(newPerson).then((response) => {
         setPersons(persons.concat(response.data));
         setNewName('');
