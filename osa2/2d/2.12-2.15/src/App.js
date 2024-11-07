@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import personService from './services/personService'; // Import the personService
+
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
@@ -10,13 +11,13 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
 
+  // Use personService to fetch data from the server
   useEffect(() => {
-    // Haetaan alkutila palvelimelta
-    axios
-      .get('http://localhost:3001/persons')
-      .then((response) => {
-        setPersons(response.data);
-      });
+    personService.getAll().then((response) => {
+      setPersons(response.data);
+    }).catch((error) => {
+      console.error('Error fetching persons:', error);
+    });
   }, []);
 
   const handleNameChange = (event) => setNewName(event.target.value);
@@ -28,18 +29,17 @@ const App = () => {
     const personExists = persons.some((person) => person.name === newName);
 
     if (personExists) {
-      alert(`${newName} is already added to phonebook`);
+      alert(`${newName} is already added to the phonebook`);
     } else {
       const newPerson = { name: newName, number: newNumber };
 
-      // Lisätään uusi henkilö palvelimelle
-      axios
-        .post('http://localhost:3001/persons', newPerson)
-        .then((response) => {
-          setPersons(persons.concat(response.data));
-          setNewName('');
-          setNewNumber('');
-        });
+      personService.create(newPerson).then((response) => {
+        setPersons(persons.concat(response.data));
+        setNewName('');
+        setNewNumber('');
+      }).catch((error) => {
+        console.error('Error adding person:', error);
+      });
     }
   };
 
