@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import personService from './services/personService';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
-import './App.css';
+import './App.css'
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -16,7 +15,18 @@ const App = () => {
   useEffect(() => {
     // Haetaan alkutila palvelimelta
     personService.getAll().then((initialPersons) => {
-      setPersons(initialPersons);
+      // Järjestetään tiedot oikeassa järjestyksessä
+      const orderedPersons = initialPersons.map(person => ({
+        name: person.name,
+        number: person.number,
+        id: person.id
+      }));
+      setPersons(orderedPersons);
+    }).catch(error => {
+      setNotification({
+        message: 'Error loading data from server.',
+        type: 'error'
+      });
     });
   }, []);
 
@@ -28,13 +38,12 @@ const App = () => {
     event.preventDefault();
     const personExists = persons.find((person) => person.name === newName);
 
-    // Check if person exists, update their number if so
     if (personExists) {
       const confirmUpdate = window.confirm(
         `${newName} is already in the phonebook. Do you want to replace their old number with the new one?`
       );
       if (confirmUpdate) {
-        const updatedPerson = { ...personExists, number: newNumber };
+        const updatedPerson = { name: newName, number: newNumber, id: personExists.id }; // Varmistetaan järjestys
         personService
           .update(personExists.id, updatedPerson)
           .then((response) => {
@@ -64,10 +73,8 @@ const App = () => {
           });
       }
     } else {
-      // Generate a new ID by finding the max ID and adding 1
       const newId = (Math.max(...persons.map((person) => parseInt(person.id))) + 1).toString();
-
-      const newPerson = { id: newId, name: newName, number: newNumber };
+      const newPerson = { name: newName, number: newNumber, id: newId }; // Varmistetaan järjestys
       personService
         .create(newPerson)
         .then((response) => {
@@ -125,9 +132,8 @@ const App = () => {
     }
   };
 
-  // Safely filter persons, checking for undefined or missing 'name' property
-  const filteredPersons = persons.filter(
-    (person) => person && person.name && person.name.toLowerCase().includes(filter.toLowerCase())
+  const filteredPersons = persons && persons.filter((person) =>
+    person && person.name && person.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
