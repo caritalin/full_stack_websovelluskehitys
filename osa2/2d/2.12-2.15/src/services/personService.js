@@ -13,6 +13,7 @@ const create = (newPerson) => {
 const update = (id, updatedPerson) => {
   return axios.put(`${baseUrl}/${id}`, updatedPerson);
 };
+
 const remove = (id) => {
   return axios.delete(`${baseUrl}/${id}`);
 };
