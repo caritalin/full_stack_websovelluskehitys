@@ -49,15 +49,15 @@ const CountryApp = () => {
         ) : filteredCountries.length > 1 ? (
           <ul>
             {filteredCountries.map((country) => (
-              <li key={country.cca3} onClick={() => handleShowDetails(country)}>
+              <li key={country.cca3}>
                 {country.name.common}
+                <button onClick={() => handleShowDetails(country)}>Show Details</button>
               </li>
             ))}
           </ul>
         ) : filteredCountries.length === 1 ? (
           <div>
             <h2>{filteredCountries[0].name.common}</h2>
-            {/* Check if flags is an object or an array */}
             <img
               src={
                 Array.isArray(filteredCountries[0].flags)
