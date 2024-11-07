@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import personService from './services/personService'; // Import the personService
-
+import personService from './services/personService';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
@@ -11,12 +10,10 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
 
-  // Use personService to fetch data from the server
+  // Fetch persons from server
   useEffect(() => {
     personService.getAll().then((response) => {
       setPersons(response.data);
-    }).catch((error) => {
-      console.error('Error fetching persons:', error);
     });
   }, []);
 
@@ -37,8 +34,17 @@ const App = () => {
         setPersons(persons.concat(response.data));
         setNewName('');
         setNewNumber('');
+      });
+    }
+  };
+
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this person?');
+    if (confirmDelete) {
+      personService.remove(id).then(() => {
+        setPersons(persons.filter((person) => person.id !== id));
       }).catch((error) => {
-        console.error('Error adding person:', error);
+        console.error('Error deleting person:', error);
       });
     }
   };
@@ -60,7 +66,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} handleDelete={handleDelete} />
     </div>
   );
 };
